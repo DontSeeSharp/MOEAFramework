@@ -22,15 +22,14 @@ import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.Program;
 import org.moeaframework.problem.AbstractProblem;
 import org.moeaframework.util.tree.Add;
-import org.moeaframework.util.tree.Cos;
+import org.moeaframework.util.tree.Cosh;
 import org.moeaframework.util.tree.Divide;
 import org.moeaframework.util.tree.Environment;
-import org.moeaframework.util.tree.Exp;
 import org.moeaframework.util.tree.Get;
 import org.moeaframework.util.tree.Log;
 import org.moeaframework.util.tree.Multiply;
 import org.moeaframework.util.tree.Rules;
-import org.moeaframework.util.tree.Sin;
+import org.moeaframework.util.tree.Sinh;
 import org.moeaframework.util.tree.Subtract;
 
 /**
@@ -108,9 +107,8 @@ public class SymbolicRegression extends AbstractProblem {
 		rules.add(new Multiply());
 		rules.add(new Subtract());
 		rules.add(new Divide());
-		rules.add(new Sin());
-		rules.add(new Cos());
-		rules.add(new Exp());
+		rules.add(new Sinh());
+		rules.add(new Cosh());
 		rules.add(new Log());
 		rules.add(new Get(Number.class, symbol));
 		rules.setReturnType(Number.class);
@@ -271,11 +269,18 @@ public class SymbolicRegression extends AbstractProblem {
 		}
 
 		solution.setObjective(0, difference);
+
+		int treeSizePenalize = 0;
+		Program program = (Program) solution.getVariable(0);
+		if (program.size() > 30) {
+			treeSizePenalize = program.size() / 2;
+		}
+		solution.setObjective(1, treeSizePenalize);
 	}
 
 	@Override
 	public Solution newSolution() {
-		Solution solution = new Solution(1, 1);
+		Solution solution = new Solution(1, 2);
 		solution.setVariable(0, new Program(rules));
 		return solution;
 	}
